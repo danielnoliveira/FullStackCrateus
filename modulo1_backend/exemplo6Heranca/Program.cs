@@ -35,6 +35,7 @@ namespace exemplo6Heranca
             }
 
             public void infoCar(){
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("Nome do carro: "+this.GetName()+", portas:"+Convert.ToString(this.GetDoors())+", placa:"+this.Placa);
             }
         }
