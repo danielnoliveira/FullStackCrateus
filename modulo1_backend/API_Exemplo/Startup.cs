@@ -11,6 +11,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using API_Exemplo.Persistence.Contexts;
+using API_Exemplo.Domain.Repositories;
+using API_Exemplo.Persistence.Repositories;
+using API_Exemplo.Domain.Services;
+using API_Exemplo.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace API_Exemplo
 {
@@ -26,7 +32,11 @@ namespace API_Exemplo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddDbContext<AppDbContext>(options => {
+                options.UseInMemoryDatabase("supermarket-api-in-memory");
+            });
+            services.AddScoped<ICategoryRepository,CategoryRepository>();
+            services.AddScoped<ICategoryService,CategoryService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
