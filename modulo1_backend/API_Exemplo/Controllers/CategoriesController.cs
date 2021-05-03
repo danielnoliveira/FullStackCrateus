@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using API_Exemplo.Domain.Services;
 using API_Exemplo.Domain.Models;
+using AutoMapper;
+using API_Exemplo.Resources;
+using API_Exemplo.Extensions;
 
 namespace API_Exemplo.Controllers
 {
@@ -12,15 +15,34 @@ namespace API_Exemplo.Controllers
   public class CategoryController: Controller
   {
     private readonly ICategoryService _categoryService;
-    public CategoryController(ICategoryService categoryService){
+    private readonly IMapper _mapper;
+    public CategoryController(ICategoryService categoryService,IMapper mapper){
       _categoryService = categoryService;
+      _mapper = mapper;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Category>> GetAllAsync(string value)
+    public async Task<IEnumerable<CategoryResource>> GetAllAsync()
     {
       var categories = await _categoryService.ListAsync();
-      return categories;
+      var resources = _mapper.Map<IEnumerable<Category>,IEnumerable<CategoryResource>>(categories);
+      return resources;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> PostAsync([FromBody]SaveCategoryResource resource){
+      if(!ModelState.IsValid)
+        return BadRequest(ModelState.GetErrorMessages());
+      
+      var category = _mapper.Map<SaveCategoryResource, Category>(resource);
+      var result = await _categoryService.SaveAsync(category);
+
+      if(!result.Success)
+        return BadRequest(result.Message);
+      
+      var categoryResource = _mapper.Map<Category,CategoryResource>(result.Category);
+
+      return Ok(categoryResource);
     }
   }
   
